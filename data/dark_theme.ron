@@ -28,7 +28,11 @@
       "color": "#C42B1C"
     },
     "top_bar_color": {
-      "color": "{Gray.100}"
+      // CER-868 row 5 — palette.toml `bg-stage`. Co-reference with
+      // `panel_bg_color`: both are {Gray.100} (#0d0d0d) upstream, so they move
+      // in lockstep — otherwise row 1 would split one upstream colour into two
+      // Studio colours and seam the top bar against the panel it abuts.
+      "color": "#10161f"
     },
     "tab_bar_color": {
       "color": "{Gray.200}"
@@ -122,7 +126,9 @@
     },
 
     "panel_bg_color": {
-      "color": "{Gray.100}"
+      // CER-868 row 1 — palette.toml `bg-stage` (was {Gray.100} #0d0d0d). The
+      // idle/letterbox stage fill `paint_background_fill` reads directly.
+      "color": "#10161f"
     },
     "text_edit_bg_color": {
       "color": "{Gray.200}"
@@ -143,10 +149,18 @@
     },
 
     "notification_panel_background_color": {
-      "color": "{Gray.150}"
+      // CER-868 row 4 — palette.toml `bg-elevated` (was {Gray.150} #171717).
+      // The notification-list PANEL: the deeper of the two toast surfaces,
+      // preserving upstream's panel-deeper-than-card ordering.
+      "color": "#182338"
     },
     "notification_background_color": {
-      "color": "{Gray.200}"
+      // CER-868 row 4 — palette.toml `border` (was {Gray.200} #212121). The
+      // individual toast CARD: the brighter of the two named Studio values, so
+      // the card still reads raised above its panel. `border`'s hue is used
+      // here as a surface fill, not a stroke — it is the elevated blue-grey the
+      // Studio palette assigns to this rung above `bg-elevated`.
+      "color": "#223047"
     },
 
     "table_header_bg_fill": {
