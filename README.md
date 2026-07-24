@@ -6,7 +6,8 @@ localized Cerulion patch**: a handful of design-token colour edits in
 `data/dark_theme.ron` that restyle the parts of the embedded rerun viewer's
 chrome that `re_ui` paints **directly from its static `DesignTokens`** (loaded
 from RON at compile time, no runtime setter) — the surfaces the Cerulion Studio
-shell's egui `Visuals` override provably cannot reach. Tracked in **CER-868**.
+shell's egui `Visuals` override provably cannot reach. Tracked in **CER-868**
+(and extended by **CER-882**, which maps the stage-top view-tab band).
 The full delta is in [`CERULION-PATCH.md`](./CERULION-PATCH.md).
 
 **The patch is RON-only** — no Rust, no `Cargo.toml`, no test changes. It edits
@@ -33,7 +34,7 @@ values at runtime — the only lever is the RON. The patched tokens (dark theme)
 |---|---|---|
 | 1 — solid stage background | `panel_bg_color` | `--cer-bg-stage` |
 | 4 — notification toasts | `notification_panel_background_color`, `notification_background_color` | `--cer-bg-elevated`, `--cer-border` |
-| 5 — chrome that reads tokens directly | `top_bar_color` (conservative subset) | `--cer-bg-stage` |
+| 5 — chrome that reads tokens directly | `top_bar_color`, `tab_bar_color` (CER-882) | `--cer-bg-stage`, `--cer-bg-header` |
 
 Values come from Studio's single-source-of-truth palette,
 `native/studio-shell/palette.toml`. See `CERULION-PATCH.md` for the per-token

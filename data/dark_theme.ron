@@ -35,7 +35,32 @@
       "color": "#10161f"
     },
     "tab_bar_color": {
-      "color": "{Gray.200}"
+      // CERULION FORK — CER-882: palette.toml `bg-header` (was {Gray.200}
+      // #212121, a WARM neutral). This is the STAGE-TOP BAND: `re_viewport`'s
+      // `TabViewer::tab_bar_color` reads this token directly, and `egui_tiles`
+      // fills the whole view-tab strip with it (`container/tabs.rs`
+      // `tab_bar_ui`) — the band that abuts Studio's `bg-header` #0c1219
+      // sidebar header across the shell's divider. Two chrome bands meeting at
+      // one seam must read as ONE surface, so the tab bar takes the same
+      // chrome tone the sidebar header + status bar already use.
+      //
+      // It is deeper than `panel_bg_color` (#10161f) BY DESIGN — that is
+      // Studio's chrome grammar (chrome bands sit under content, exactly like
+      // the sidebar's header/footer under its topic list), and an ACTIVE tab is
+      // painted from `visuals.panel_fill` so it still lifts out of the bar and
+      // connects to the stage below.
+      //
+      // Also reached: `egui_tiles::Behavior::resize_stroke` paints the IDLE gap
+      // between side-by-side tiles with this colour, so the seams between views
+      // stop being warm-grey lines on a cool blue-black stage.
+      //
+      // CER-868 left this token stock because mapping it alone "would introduce
+      // a blue/neutral seam against the still-stock bottom bar". That objection
+      // does not hold: `bottom_bar_color` is a DEAD token in 0.34.1 — nothing
+      // in the whole re_* graph reads it (only `design_tokens.rs`'s loader and
+      // these RON files mention it) — and the Studio shell hides the bottom/time
+      // chrome anyway (CER-853). It stays stock; there is no seam to make.
+      "color": "#0c1219"
     },
     "bottom_bar_color": {
       "color": "{Gray.150}"

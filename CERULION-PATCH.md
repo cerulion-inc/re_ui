@@ -1,4 +1,4 @@
-# CERULION fork of `re_ui` 0.34.1 — CER-868
+# CERULION fork of `re_ui` 0.34.1 — CER-868 (+ CER-882)
 
 This repository (`cerulion-inc/re_ui`) is a **sparse crate fork** of **upstream
 `re_ui` 0.34.1** (from `rerun-io/rerun`, exactly as published to crates.io)
@@ -40,8 +40,9 @@ sans.)
 
 **RON-only.** The only tracked change from `upstream` to `main` (besides these
 fork docs, the two `LICENSE-*` files, `import-upstream.sh`, and `.gitignore`) is
-four colour-token edits in `data/dark_theme.ron`. No Rust, no `Cargo.toml`, no
-`data/color_table.ron`, no test changes.
+**five** colour-token edits in `data/dark_theme.ron` (four from CER-868, one
+added by CER-882). No Rust, no `Cargo.toml`, no `data/color_table.ron`, no test
+changes.
 
 All values are Studio palette colours from the single source of truth,
 `cerulion-studio/native/studio-shell/palette.toml` (CER-856 — `build.rs` compiles
@@ -55,6 +56,7 @@ are the resolution of the `{Gray.N}` reference through `data/color_table.ron`.
 | 4 | `notification_panel_background_color` | `{Gray.150}` = `#171717` | `#182338` | `bg-elevated` (L22) |
 | 4 | `notification_background_color` | `{Gray.200}` = `#212121` | `#223047` | `border` (L29) |
 | 5 | `top_bar_color` | `{Gray.100}` = `#0d0d0d` | `#10161f` | `bg-stage` (L20) |
+| 5 | `tab_bar_color` (CER-882) | `{Gray.200}` = `#212121` | `#0c1219` | `bg-header` (L21) |
 
 ### Row 1 — solid stage background
 
@@ -88,7 +90,9 @@ is kept.)
 `CANNOT-MATCH.md` row 5 is **polish, not correctness**: CER-853 (the bare stage)
 hides this chrome, so it is not visible in the shipping Studio surface. The
 instruction was to map **only** tokens with a clear palette counterpart and leave
-anything ambiguous stock. Exactly one row-5 token is unambiguous:
+anything ambiguous stock. CER-868 mapped the one token that was unambiguous then
+(`top_bar_color`); CER-882 adds `tab_bar_color`, whose deferral rested on a
+premise that turned out to be false (see below). Everything else stays stock:
 
 **Mapped:**
 
@@ -98,12 +102,41 @@ anything ambiguous stock. Exactly one row-5 token is unambiguous:
   and seam the top bar against the panel it abuts. So this is not a new tier
   judgment — it preserves an existing upstream colour identity.
 
+- `tab_bar_color` → `bg-header` `#0c1219` (**CER-882**). This is the
+  **stage-top band**: `re_viewport`'s `TabViewer::tab_bar_color` reads this token
+  directly, and `egui_tiles` fills the entire view-tab strip with it
+  (`container/tabs.rs::tab_bar_ui` → `painter().rect_filled(max_rect, …,
+  behavior.tab_bar_color(..))`). In the Studio shell that strip is the **only**
+  rerun chrome still visible at the top of the bare stage, and it abuts the
+  sidebar's `bg-header` `#0c1219` header across the shell's 1px divider — two
+  chrome bands meeting at one seam, reading as two different tones (cool
+  blue-black vs the warm neutral `#212121`). Mapping it to `bg-header` makes the
+  window's top chrome ONE surface.
+
+  It is *deeper* than `panel_bg_color` (`#10161f`) by design: that is Studio's
+  chrome grammar (chrome bands sit under content — the sidebar's header and
+  status bar are `bg-header` under a `bg-stage` list), and `egui_tiles` paints an
+  ACTIVE tab from `visuals.panel_fill`, so the active tab still lifts out of the
+  bar and connects to the stage below it.
+
+  Also reached by this token: `egui_tiles::Behavior::resize_stroke` paints the
+  **idle gap between side-by-side tiles** with `tab_bar_color`, so the seams
+  between views stop being warm-grey lines across a cool blue-black stage.
+
+  **Why CER-868 deferred it, and why that no longer holds.** CER-868 left this
+  token stock on the grounds that mapping it alone "would introduce a
+  blue/neutral seam against the still-stock bottom bar". That objection is
+  vacuous: `bottom_bar_color` is a **dead token** in 0.34.1 — nothing in the
+  re_\* graph reads it (a whole-registry grep finds it only in `re_ui`'s own
+  `design_tokens.rs` loader and these two RON files) — so there is no bottom bar
+  painted from it to seam against, and the Studio shell hides the bottom/time
+  chrome regardless (CER-853). It therefore stays stock.
+
 **Left stock (ambiguous tier — noted, per the conservative rule):**
 
 | Token | Upstream | Why left stock |
 |---|---|---|
-| `bottom_bar_color` | `{Gray.150}` `#171717` | Upstream sits one rung above the panel; no Studio surface lands cleanly at that rung without a designer tier pick. |
-| `tab_bar_color` | `{Gray.200}` `#212121` | Same — a distinct upstream rung above the bottom bar; mapping it (and only it) would introduce a blue/neutral seam against the still-stock bottom bar. |
+| `bottom_bar_color` | `{Gray.150}` `#171717` | **Dead token in 0.34.1** — no consumer in the whole `re_*` graph reads it (only `design_tokens.rs`'s loader and the RON files name it), and CER-853 hides the bottom/time chrome anyway. Mapping it would be pure noise. |
 | `blueprint_time_panel_bg_fill` | `#141326` (literal purple-black) | A distinct purple hue, not a neutral grey — no direct palette counterpart. |
 | `section_header_color`, `list_item_*`, `table_*` (headers, interaction strokes, grid cards) | various `{Gray.N}` | Whole token *families*; a partial mapping seams within one widget. A coherent restyle needs a designer tier assignment across the family, out of this conservative pass's scope. |
 | `viewport_background` | `{Gray.0}` `#000000` | This is the per-view scene-background fallback = `CANNOT-MATCH.md` **rows 2–3**, closed by the vizd `Background` blueprint component — explicitly out of this fork's scope. |
