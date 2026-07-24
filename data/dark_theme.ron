@@ -55,11 +55,20 @@
       // stop being warm-grey lines on a cool blue-black stage.
       //
       // CER-868 left this token stock because mapping it alone "would introduce
-      // a blue/neutral seam against the still-stock bottom bar". That objection
-      // does not hold: `bottom_bar_color` is a DEAD token in 0.34.1 — nothing
-      // in the whole re_* graph reads it (only `design_tokens.rs`'s loader and
-      // these RON files mention it) — and the Studio shell hides the bottom/time
-      // chrome anyway (CER-853). It stays stock; there is no seam to make.
+      // a blue/neutral seam against the still-stock bottom bar". There is no
+      // such seam — but NOT because `bottom_bar_color` is unused. It is read:
+      // `DesignTokens::bottom_panel_frame()` takes it as the frame `fill`
+      // (`src/design_tokens.rs`), and `re_viewer` calls that helper at four
+      // sites. Three of them replace the fill straight away — the blueprint
+      // time panel (`.fill(blueprint_time_panel_bg_fill)`), the dev panel and
+      // the iOS/Android mobile-warning banner (both `ui.visuals().panel_fill`)
+      // — so this colour survives to the screen at exactly ONE: the time panel
+      // / streams view, which takes the frame verbatim. Studio's bare stage
+      // pins `panel_state_overrides.time = Some(PanelState::Hidden)` (CER-853)
+      // and `TimePanel::show_panel` early-returns while hidden, so that one
+      // surface never paints in the default UI. It stays stock: nothing visible
+      // to seam against, and upstream's rung sits above the panel with no clean
+      // Studio tier. See CERULION-PATCH.md for the call-site list.
       "color": "#0c1219"
     },
     "bottom_bar_color": {

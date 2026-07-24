@@ -125,18 +125,34 @@ premise that turned out to be false (see below). Everything else stays stock:
 
   **Why CER-868 deferred it, and why that no longer holds.** CER-868 left this
   token stock on the grounds that mapping it alone "would introduce a
-  blue/neutral seam against the still-stock bottom bar". That objection is
-  vacuous: `bottom_bar_color` is a **dead token** in 0.34.1 — nothing in the
-  re_\* graph reads it (a whole-registry grep finds it only in `re_ui`'s own
-  `design_tokens.rs` loader and these two RON files) — so there is no bottom bar
-  painted from it to seam against, and the Studio shell hides the bottom/time
-  chrome regardless (CER-853). It therefore stays stock.
+  blue/neutral seam against the still-stock bottom bar". There is no such seam
+  — but **not** because `bottom_bar_color` is unused. It is genuinely read:
+  `re_ui::DesignTokens::bottom_panel_frame()` takes it as the returned frame's
+  `fill` (`src/design_tokens.rs`), and `re_viewer` 0.34.1 calls that helper at
+  four sites. Three of them replace `fill` immediately, so the token never
+  reaches the screen through them:
+
+  | Call site | What it paints | Fill actually used |
+  |---|---|---|
+  | `re_viewer/src/app_state.rs` (blueprint time panel) | blueprint timeline | `.fill(blueprint_time_panel_bg_fill)` |
+  | `re_viewer/src/app/ui.rs` (`dev_panel_ui`) | dev panel | `ui.visuals().panel_fill` |
+  | `re_viewer/src/ui/mobile_warning_ui.rs` | iOS/Android warning banner | `ui.visuals().panel_fill` |
+  | `re_viewer/src/app_state.rs` (time panel) | **time panel / streams view** | **`bottom_bar_color`** |
+
+  So it survives to the screen at exactly one surface — and Studio's bare stage
+  pins `panel_state_overrides.time = Some(PanelState::Hidden)` (CER-853,
+  `native/studio-shell/src/bare_stage.rs`), while
+  `re_time_panel::TimePanel::show_panel` early-returns on `state.is_hidden()`.
+  That surface therefore never paints in the default Studio UI; it is reachable
+  only via the `STUDIO_SHELL_DEBUG_UI=1` escape hatch, where the rest of the
+  stock chrome is back anyway. It stays stock: there is nothing visible to seam
+  against, and (per the row below) upstream's rung has no clean Studio tier.
 
 **Left stock (ambiguous tier — noted, per the conservative rule):**
 
 | Token | Upstream | Why left stock |
 |---|---|---|
-| `bottom_bar_color` | `{Gray.150}` `#171717` | **Dead token in 0.34.1** — no consumer in the whole `re_*` graph reads it (only `design_tokens.rs`'s loader and the RON files name it), and CER-853 hides the bottom/time chrome anyway. Mapping it would be pure noise. |
+| `bottom_bar_color` | `{Gray.150}` `#171717` | Read by `bottom_panel_frame()`, but it survives un-overridden at exactly one `re_viewer` call site — the time panel / streams view (see the four-site table above) — and CER-853's bare stage pins that panel `Hidden`, so it never paints in the default Studio UI. Upstream also sits one rung above the panel with no clean Studio tier. Mapping it would move nothing visible. |
 | `blueprint_time_panel_bg_fill` | `#141326` (literal purple-black) | A distinct purple hue, not a neutral grey — no direct palette counterpart. |
 | `section_header_color`, `list_item_*`, `table_*` (headers, interaction strokes, grid cards) | various `{Gray.N}` | Whole token *families*; a partial mapping seams within one widget. A coherent restyle needs a designer tier assignment across the family, out of this conservative pass's scope. |
 | `viewport_background` | `{Gray.0}` `#000000` | This is the per-view scene-background fallback = `CANNOT-MATCH.md` **rows 2–3**, closed by the vizd `Background` blueprint component — explicitly out of this fork's scope. |
