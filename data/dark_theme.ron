@@ -32,19 +32,19 @@
       // `panel_bg_color`: both are {Gray.100} (#0d0d0d) upstream, so they move
       // in lockstep — otherwise row 1 would split one upstream colour into two
       // Studio colours and seam the top bar against the panel it abuts.
-      "color": "#10161f"
+      "color": "#0b0d11"
     },
     "tab_bar_color": {
       // CERULION FORK — CER-882: palette.toml `bg-header` (was {Gray.200}
       // #212121, a WARM neutral). This is the STAGE-TOP BAND: `re_viewport`'s
       // `TabViewer::tab_bar_color` reads this token directly, and `egui_tiles`
       // fills the whole view-tab strip with it (`container/tabs.rs`
-      // `tab_bar_ui`) — the band that abuts Studio's `bg-header` #0c1219
+      // `tab_bar_ui`) — the band that abuts Studio's `bg-header` #080a0d
       // sidebar header across the shell's divider. Two chrome bands meeting at
       // one seam must read as ONE surface, so the tab bar takes the same
       // chrome tone the sidebar header + status bar already use.
       //
-      // It is deeper than `panel_bg_color` (#10161f) BY DESIGN — that is
+      // It is deeper than `panel_bg_color` (#0b0d11) BY DESIGN — that is
       // Studio's chrome grammar (chrome bands sit under content, exactly like
       // the sidebar's header/footer under its topic list), and an ACTIVE tab is
       // painted from `visuals.panel_fill` so it still lifts out of the bar and
@@ -69,7 +69,7 @@
       // surface never paints in the default UI. It stays stock: nothing visible
       // to seam against, and upstream's rung sits above the panel with no clean
       // Studio tier. See CERULION-PATCH.md for the call-site list.
-      "color": "#0c1219"
+      "color": "#080a0d"
     },
     "bottom_bar_color": {
       "color": "{Gray.150}"
@@ -162,7 +162,7 @@
     "panel_bg_color": {
       // CER-868 row 1 — palette.toml `bg-stage` (was {Gray.100} #0d0d0d). The
       // idle/letterbox stage fill `paint_background_fill` reads directly.
-      "color": "#10161f"
+      "color": "#0b0d11"
     },
     "text_edit_bg_color": {
       "color": "{Gray.200}"
@@ -186,7 +186,7 @@
       // CER-868 row 4 — palette.toml `bg-elevated` (was {Gray.150} #171717).
       // The notification-list PANEL: the deeper of the two toast surfaces,
       // preserving upstream's panel-deeper-than-card ordering.
-      "color": "#182338"
+      "color": "#181a1e"
     },
     "notification_background_color": {
       // CER-868 row 4 — palette.toml `border` (was {Gray.200} #212121). The
@@ -194,7 +194,7 @@
       // the card still reads raised above its panel. `border`'s hue is used
       // here as a surface fill, not a stroke — it is the elevated blue-grey the
       // Studio palette assigns to this rung above `bg-elevated`.
-      "color": "#223047"
+      "color": "#232a34"
     },
 
     "table_header_bg_fill": {

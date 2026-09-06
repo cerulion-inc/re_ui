@@ -38,6 +38,10 @@ sans.)
 
 ## The patch (delta vs upstream 0.34.1)
 
+Values below track the Cerulion brand palette adopted by `palette.toml` (Void
+`#0b0d11`, Ground Ink `#181a1e`, hairline `#232a34`); the token set and call-site
+analysis are unchanged from CER-868 / CER-882.
+
 **RON-only.** The only tracked change from `upstream` to `main` (besides these
 fork docs, the two `LICENSE-*` files, `import-upstream.sh`, and `.gitignore`) is
 **five** colour-token edits in `data/dark_theme.ron` (four from CER-868, one
@@ -52,11 +56,11 @@ are the resolution of the `{Gray.N}` reference through `data/color_table.ron`.
 
 | CANNOT-MATCH row | Token (`dark_theme.ron`) | Upstream | New | palette.toml token (line) |
 |---|---|---|---|---|
-| 1 | `panel_bg_color` | `{Gray.100}` = `#0d0d0d` | `#10161f` | `bg-stage` (L20) |
-| 4 | `notification_panel_background_color` | `{Gray.150}` = `#171717` | `#182338` | `bg-elevated` (L22) |
-| 4 | `notification_background_color` | `{Gray.200}` = `#212121` | `#223047` | `border` (L29) |
-| 5 | `top_bar_color` | `{Gray.100}` = `#0d0d0d` | `#10161f` | `bg-stage` (L20) |
-| 5 | `tab_bar_color` (CER-882) | `{Gray.200}` = `#212121` | `#0c1219` | `bg-header` (L21) |
+| 1 | `panel_bg_color` | `{Gray.100}` = `#0d0d0d` | `#0b0d11` | `bg-stage` |
+| 4 | `notification_panel_background_color` | `{Gray.150}` = `#171717` | `#181a1e` | `bg-elevated` |
+| 4 | `notification_background_color` | `{Gray.200}` = `#212121` | `#232a34` | `border` |
+| 5 | `top_bar_color` | `{Gray.100}` = `#0d0d0d` | `#0b0d11` | `bg-stage` |
+| 5 | `tab_bar_color` (CER-882) | `{Gray.200}` = `#212121` | `#080a0d` | `bg-header` |
 
 ### Row 1 — solid stage background
 
@@ -73,9 +77,9 @@ list **panel** deeper (`{Gray.150}`) than each toast **card** (`{Gray.200}`).
 `CANNOT-MATCH.md` names the two Studio target surfaces as `--cer-bg-elevated` and
 `--cer-border`; they are mapped to **preserve that upstream ordering**:
 
-- `notification_panel_background_color` → `bg-elevated` `#182338` (the deeper of
+- `notification_panel_background_color` → `bg-elevated` `#181a1e` (the deeper of
   the two — the panel).
-- `notification_background_color` → `border` `#223047` (the brighter of the two —
+- `notification_background_color` → `border` `#232a34` (the brighter of the two —
   the toast card still reads raised above its panel).
 
 `border` (`#223047`) is used here as a **surface fill**, not a stroke; it is the
