@@ -82,7 +82,7 @@ list **panel** deeper (`{Gray.150}`) than each toast **card** (`{Gray.200}`).
 - `notification_background_color` → `border` `#232a34` (the brighter of the two —
   the toast card still reads raised above its panel).
 
-`border` (`#223047`) is used here as a **surface fill**, not a stroke; it is the
+`border` (`#232a34`) is used here as a **surface fill**, not a stroke; it is the
 elevated blue-grey the Studio palette assigns to the rung just above
 `bg-elevated`, and it is exactly one of the two values `CANNOT-MATCH.md` row 4
 names. (The non-fork alternative — `AppOptions.show_notification_toasts = false`
@@ -100,24 +100,24 @@ premise that turned out to be false (see below). Everything else stays stock:
 
 **Mapped:**
 
-- `top_bar_color` → `bg-stage` `#10161f`. This is a **co-reference** with
+- `top_bar_color` → `bg-stage` `#0b0d11`. This is a **co-reference** with
   `panel_bg_color` (row 1): both are `{Gray.100}` `#0d0d0d` upstream. Moving one
   without the other would split a single upstream colour into two Studio colours
   and seam the top bar against the panel it abuts. So this is not a new tier
   judgment — it preserves an existing upstream colour identity.
 
-- `tab_bar_color` → `bg-header` `#0c1219` (**CER-882**). This is the
+- `tab_bar_color` → `bg-header` `#080a0d` (**CER-882**). This is the
   **stage-top band**: `re_viewport`'s `TabViewer::tab_bar_color` reads this token
   directly, and `egui_tiles` fills the entire view-tab strip with it
   (`container/tabs.rs::tab_bar_ui` → `painter().rect_filled(max_rect, …,
   behavior.tab_bar_color(..))`). In the Studio shell that strip is the **only**
   rerun chrome still visible at the top of the bare stage, and it abuts the
-  sidebar's `bg-header` `#0c1219` header across the shell's 1px divider — two
+  sidebar's `bg-header` `#080a0d` header across the shell's 1px divider — two
   chrome bands meeting at one seam, reading as two different tones (cool
   blue-black vs the warm neutral `#212121`). Mapping it to `bg-header` makes the
   window's top chrome ONE surface.
 
-  It is *deeper* than `panel_bg_color` (`#10161f`) by design: that is Studio's
+  It is *deeper* than `panel_bg_color` (`#0b0d11`) by design: that is Studio's
   chrome grammar (chrome bands sit under content — the sidebar's header and
   status bar are `bg-header` under a `bg-stage` list), and `egui_tiles` paints an
   ACTIVE tab from `visuals.panel_fill`, so the active tab still lifts out of the
