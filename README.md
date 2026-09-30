@@ -15,8 +15,8 @@ crate's behaviour is identical to upstream except for the token colour values.
 This makes it an even smaller fork than the `re_grpc_server` precedent below.
 
 This is a *single-crate* fork (one crate at the repo root), not a fork of the
-whole rerun monorepo. It is consumed by `cerulion-studio` (and, if pinned there,
-`cerulion-base`) as a `git` `[patch.crates-io]` pin — the same model as
+whole rerun monorepo. Its one consumer, `cerulion-studio`, pins it as a `git`
+`[patch.crates-io]` rev in `native/studio-shell/Cargo.toml` — the same model as
 [`cerulion-inc/re_grpc_server`](https://github.com/cerulion-inc/re_grpc_server)
 (CER-858) and [`cerulion-inc/RustDDS`](https://github.com/cerulion-inc/RustDDS)
 — keeping cold-CI git-clone weight to this one small crate instead of rerun's
@@ -59,14 +59,52 @@ the fork docs) and makes version bumps a clean merge.
 
 ```sh
 # 1. Refresh the upstream branch to the new crates.io tarball + tag it.
-./import-upstream.sh 0.35.0
+VERSION=0.35.0
+./import-upstream.sh "$VERSION"
 
-# 2. Bring the patch forward onto main (resolve any conflicts in the RON).
-git checkout main
-git merge upstream
+# 2. Before merging, main must contain the rev Studio pins now. studio_pin
+#    prints the re_ui rev that native/studio-shell/Cargo.toml [patch.crates-io]
+#    names on cerulion-studio's main, read through STUDIO, your local
+#    cerulion-studio clone; PINNED is that rev. If main lacks it, the merge
+#    would drop Studio's current tokens, so the check prints stop: bring that
+#    rev onto main first, and skip steps 3 and 4 until then. It also stops if
+#    main cannot be checked out here (for example, another worktree has it),
+#    since the merge must run on main. Otherwise bring the patch forward onto
+#    main, publish both branches and the new upstream tag so Studio can fetch
+#    the rev, and record the new main head as REV. REV is cleared first, so it
+#    is set only when this run succeeds. If the merge stops on a conflict in
+#    the RON, resolve it, commit, and run this block again.
+STUDIO=../cerulion-studio
+studio_pin() {
+    git -C "$STUDIO" fetch -q origin main &&
+        git -C "$STUDIO" show origin/main:native/studio-shell/Cargo.toml |
+        sed -n 's/^re_ui = .*rev = "\([0-9a-f]\{40\}\)".*/\1/p'
+}
+unset REV
+PINNED=$(studio_pin)
+if git checkout main && git merge-base --is-ancestor "$PINNED" main; then
+    git merge upstream &&
+        git push origin upstream main "refs/tags/upstream/$VERSION" &&
+        REV=$(git rev-parse main)
+else
+    echo "stop: main must be checked out here and contain the pinned rev" >&2
+fi
 
-# 3. Rebuild + retest the Studio shell, then update the pinned rev in the
-#    consumer's Cargo.toml [patch.crates-io].
+# 3. Only once step 2 has set REV: in cerulion-studio, bump the re_ui rev in
+#    native/studio-shell/Cargo.toml [patch.crates-io] to REV, then rebuild and
+#    run the shell tests (tests/reui_fork_pin.rs must pass). Commit the bump
+#    together with the regenerated native/studio-shell/Cargo.lock and land it
+#    on Studio's main.
+
+# 4. Once that bump is on Studio's main, point the pin/cerulion-studio tag in
+#    this repository at REV and publish it. A moved tag reaches the remote only
+#    with a forced push. The guard reads the pin back from Studio's main and
+#    refuses unless it is REV and REV is on main, so the tag only ever moves to
+#    the rev Studio pins.
+[ -n "$REV" ] && [ "$(studio_pin)" = "$REV" ] &&
+    git merge-base --is-ancestor "$REV" main &&
+    git tag -f pin/cerulion-studio "$REV" &&
+    git push --force origin refs/tags/pin/cerulion-studio
 ```
 
 `import-upstream.sh` downloads the crates.io tarball for the given version,

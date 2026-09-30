@@ -2,10 +2,11 @@
 
 This repository (`cerulion-inc/re_ui`) is a **sparse crate fork** of **upstream
 `re_ui` 0.34.1** (from `rerun-io/rerun`, exactly as published to crates.io)
-**plus one localized patch**. It is pinned into the consumer (`cerulion-studio`'s
-native shell, and if pinned there `cerulion-base`) via a root `Cargo.toml`
-`[patch.crates-io]` git rev — the `cerulion-inc/re_grpc_server` (CER-858) and
-`cerulion-inc/RustDDS` fork precedents — and allow-listed in the consumer's
+**plus one localized patch**. It is pinned into its one consumer, the
+`cerulion-studio` native shell, via a `[patch.crates-io]` git rev in
+`native/studio-shell/Cargo.toml` — the `cerulion-inc/re_grpc_server` (CER-858)
+and `cerulion-inc/RustDDS` fork precedents. A consumer that gates dependency
+sources with `cargo-deny` should also allow this git source in its
 `deny.toml [sources]`.
 
 The `upstream` branch holds the crates.io 0.34.1 tarball verbatim; `main` is
@@ -149,6 +150,6 @@ tokens it alludes to all exist at those names. No investigation drift.
 ## Exit condition
 
 Drop this fork entirely (revert the consumer to the crates.io `re_ui`, prune the
-`[patch.crates-io]` rev and the `deny.toml [sources]` entry) if `re_ui` ever
-exposes a **runtime setter** for its `DesignTokens` (so token colours can be
-injected without editing the embedded RON).
+`[patch.crates-io]` rev and any `deny.toml [sources]` entry for this fork) if
+`re_ui` ever exposes a **runtime setter** for its `DesignTokens` (so token
+colours can be injected without editing the embedded RON).
