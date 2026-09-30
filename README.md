@@ -67,21 +67,22 @@ VERSION=0.35.0
 #    cerulion-studio's main, read through STUDIO, your local cerulion-studio
 #    clone. If main lacks it, the merge would drop Studio's current tokens, so
 #    the check prints stop: bring that rev onto main first, and skip steps 3
-#    and 4 until then. Otherwise bring the patch forward onto main, publish both
-#    branches and the new upstream tag so Studio can fetch the rev, and record
-#    the new main head as REV. If the merge stops on a conflict in the RON,
-#    resolve it, commit, and run this block again.
+#    and 4 until then. It also stops if main cannot be checked out here (for
+#    example, another worktree has it), since the merge must run on main.
+#    Otherwise bring the patch forward onto main, publish both branches and the
+#    new upstream tag so Studio can fetch the rev, and record the new main head
+#    as REV. If the merge stops on a conflict in the RON, resolve it, commit,
+#    and run this block again.
 STUDIO=../cerulion-studio
 PINNED=$(git -C "$STUDIO" fetch -q origin main &&
     git -C "$STUDIO" show origin/main:native/studio-shell/Cargo.toml |
     sed -n 's/^re_ui = .*rev = "\([0-9a-f]\{40\}\)".*/\1/p')
-git checkout main
-if git merge-base --is-ancestor "$PINNED" main; then
+if git checkout main && git merge-base --is-ancestor "$PINNED" main; then
     git merge upstream &&
         git push origin upstream main "refs/tags/upstream/$VERSION" &&
         REV=$(git rev-parse main)
 else
-    echo "stop: bring the pinned rev onto main first" >&2
+    echo "stop: main must be checked out here and contain the pinned rev" >&2
 fi
 
 # 3. Only once step 2 has set REV: in cerulion-studio, bump the re_ui rev in
