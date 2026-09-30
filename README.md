@@ -61,13 +61,21 @@ the fork docs) and makes version bumps a clean merge.
 # 1. Refresh the upstream branch to the new crates.io tarball + tag it.
 ./import-upstream.sh 0.35.0
 
-# 2. Bring the patch forward onto main (resolve any conflicts in the RON).
+# 2. Bring the patch forward onto main (resolve any conflicts in the RON),
+#    then publish both branches and the new upstream tag so Studio can fetch
+#    the rev.
 git checkout main
 git merge upstream
+git push origin upstream main refs/tags/upstream/0.35.0
 
 # 3. Rebuild + retest the Studio shell, then bump the pinned rev in
-#    cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io] and
-#    move the pin/cerulion-studio tag to that rev.
+#    cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io].
+
+# 4. Back in this repository, point the pin/cerulion-studio tag at that rev
+#    and publish it. A moved tag reaches the remote only with a forced push.
+#    REV is the full rev Studio now pins.
+git tag -f pin/cerulion-studio "$REV"
+git push --force origin refs/tags/pin/cerulion-studio
 ```
 
 `import-upstream.sh` downloads the crates.io tarball for the given version,

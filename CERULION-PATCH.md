@@ -150,6 +150,6 @@ tokens it alludes to all exist at those names. No investigation drift.
 ## Exit condition
 
 Drop this fork entirely (revert the consumer to the crates.io `re_ui`, prune the
-`[patch.crates-io]` rev and any `deny.toml [sources]` entry) if `re_ui` ever
-exposes a **runtime setter** for its `DesignTokens` (so token colours can be
-injected without editing the embedded RON).
+`[patch.crates-io]` rev and any `deny.toml [sources]` entry for this fork) if
+`re_ui` ever exposes a **runtime setter** for its `DesignTokens` (so token
+colours can be injected without editing the embedded RON).
