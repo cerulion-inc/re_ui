@@ -15,9 +15,9 @@
 #
 # After this, bring the Cerulion patch forward:
 #   git checkout main && git merge upstream
-# (resolve any conflicts in data/dark_theme.ron), rebuild, retest, and update
-# the pinned rev in cerulion-base's root Cargo.toml [patch.crates-io]. See
-# CERULION-PATCH.md.
+# (resolve any conflicts in data/dark_theme.ron), rebuild, retest, bump the
+# rev in cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io],
+# and move the pin/cerulion-studio tag to that rev. See CERULION-PATCH.md.
 
 set -euo pipefail
 

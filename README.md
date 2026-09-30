@@ -15,8 +15,8 @@ crate's behaviour is identical to upstream except for the token colour values.
 This makes it an even smaller fork than the `re_grpc_server` precedent below.
 
 This is a *single-crate* fork (one crate at the repo root), not a fork of the
-whole rerun monorepo. It is consumed by `cerulion-studio` (and, if pinned there,
-`cerulion-base`) as a `git` `[patch.crates-io]` pin — the same model as
+whole rerun monorepo. Its one consumer, `cerulion-studio`, pins it as a `git`
+`[patch.crates-io]` rev in `native/studio-shell/Cargo.toml` — the same model as
 [`cerulion-inc/re_grpc_server`](https://github.com/cerulion-inc/re_grpc_server)
 (CER-858) and [`cerulion-inc/RustDDS`](https://github.com/cerulion-inc/RustDDS)
 — keeping cold-CI git-clone weight to this one small crate instead of rerun's
@@ -65,8 +65,9 @@ the fork docs) and makes version bumps a clean merge.
 git checkout main
 git merge upstream
 
-# 3. Rebuild + retest the Studio shell, then update the pinned rev in the
-#    consumer's Cargo.toml [patch.crates-io].
+# 3. Rebuild + retest the Studio shell, then bump the pinned rev in
+#    cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io] and
+#    move the pin/cerulion-studio tag to that rev.
 ```
 
 `import-upstream.sh` downloads the crates.io tarball for the given version,
