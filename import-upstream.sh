@@ -25,8 +25,8 @@
 # branches and the upstream/<VERSION> tag, and take the new main head as REV.
 # Bump the rev in cerulion-studio's native/studio-shell/Cargo.toml
 # [patch.crates-io] to REV, rebuild and retest the shell (tests/reui_fork_pin.rs
-# must pass) and commit the bump with the regenerated Cargo.lock. Once that bump
-# is committed, and only if REV contains PINNED and is on main, point the
+# must pass) and land the bump with the regenerated Cargo.lock on Studio's main.
+# Then, only if Studio's main now pins REV and REV is on main, point the
 # pin/cerulion-studio tag at REV and publish it with a forced push
 # (git push --force origin refs/tags/pin/cerulion-studio). See README.md for
 # the exact commands and CERULION-PATCH.md for the patch.
