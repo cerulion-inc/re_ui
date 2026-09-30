@@ -59,14 +59,15 @@ the fork docs) and makes version bumps a clean merge.
 
 ```sh
 # 1. Refresh the upstream branch to the new crates.io tarball + tag it.
-./import-upstream.sh 0.35.0
+VERSION=0.35.0
+./import-upstream.sh "$VERSION"
 
 # 2. Bring the patch forward onto main (resolve any conflicts in the RON),
 #    then publish both branches and the new upstream tag so Studio can fetch
 #    the rev.
 git checkout main
 git merge upstream
-git push origin upstream main refs/tags/upstream/0.35.0
+git push origin upstream main "refs/tags/upstream/$VERSION"
 
 # 3. Rebuild + retest the Studio shell, then bump the pinned rev in
 #    cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io].
