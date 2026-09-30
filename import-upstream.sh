@@ -13,14 +13,20 @@
 #      .cargo_vcs_info.json / Cargo.toml.orig).
 #   3. Commits and tags `upstream/<VERSION>`.
 #
-# After this, bring the Cerulion patch forward:
+# After this, bring the Cerulion patch forward. Before merging, main must
+# contain the rev Studio pins now (PINNED, the full re_ui rev in
+# cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io]):
+#   git merge-base --is-ancestor "$PINNED" main || echo "stop: bring the pinned rev onto main first"
+# If it prints stop, do that first. Then:
 #   git checkout main && git merge upstream
 # (resolve any conflicts in data/dark_theme.ron), publish the upstream and main
-# branches and the upstream/<VERSION> tag, rebuild, retest, and bump the rev in
-# cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io].
-# Then point the pin/cerulion-studio tag at that rev and publish it with a
-# forced push (git push --force origin refs/tags/pin/cerulion-studio). See
-# README.md for the full upgrade steps and CERULION-PATCH.md for the patch.
+# branches and the upstream/<VERSION> tag, bump the rev in cerulion-studio's
+# native/studio-shell/Cargo.toml [patch.crates-io] to the new main head, then
+# rebuild and retest the shell (tests/reui_fork_pin.rs must pass) and commit the
+# bump with the regenerated Cargo.lock. Once that bump is committed, point the
+# pin/cerulion-studio tag at the same rev and publish it with a forced push
+# (git push --force origin refs/tags/pin/cerulion-studio). See README.md for
+# the full upgrade steps and CERULION-PATCH.md for the patch.
 
 set -euo pipefail
 
@@ -80,4 +86,4 @@ fi
 
 git tag -f "upstream/${VERSION}"
 echo ">> done. upstream is now ${CRATE} ${VERSION}, tagged upstream/${VERSION}."
-echo ">> next: git checkout main && git merge upstream   (then rebuild + retest)."
+echo ">> next: README.md step 2 (main must contain Studio's pinned rev before git merge upstream)."

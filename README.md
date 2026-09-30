@@ -62,19 +62,27 @@ the fork docs) and makes version bumps a clean merge.
 VERSION=0.35.0
 ./import-upstream.sh "$VERSION"
 
-# 2. Bring the patch forward onto main (resolve any conflicts in the RON),
-#    then publish both branches and the new upstream tag so Studio can fetch
-#    the rev.
+# 2. Before merging, main must contain the rev Studio pins now. PINNED is the
+#    full re_ui rev in cerulion-studio's native/studio-shell/Cargo.toml
+#    [patch.crates-io]. If main lacks it, the merge drops Studio's current
+#    tokens: stop and bring that rev onto main first. Otherwise bring the patch
+#    forward onto main (resolve any conflicts in the RON), then publish both
+#    branches and the new upstream tag so Studio can fetch the rev.
 git checkout main
-git merge upstream
-git push origin upstream main "refs/tags/upstream/$VERSION"
+if git merge-base --is-ancestor "$PINNED" main; then
+    git merge upstream && git push origin upstream main "refs/tags/upstream/$VERSION"
+else
+    echo "stop: bring the pinned rev onto main first" >&2
+fi
 
-# 3. Rebuild + retest the Studio shell, then bump the pinned rev in
-#    cerulion-studio's native/studio-shell/Cargo.toml [patch.crates-io].
+# 3. In cerulion-studio, bump the re_ui rev in native/studio-shell/Cargo.toml
+#    [patch.crates-io] to the new main head (git rev-parse main here), then
+#    rebuild and run the shell tests (tests/reui_fork_pin.rs must pass). Commit
+#    the bump together with the regenerated native/studio-shell/Cargo.lock.
 
-# 4. Back in this repository, point the pin/cerulion-studio tag at that rev
-#    and publish it. A moved tag reaches the remote only with a forced push.
-#    REV is the full rev Studio now pins.
+# 4. Once that bump is committed, point the pin/cerulion-studio tag in this
+#    repository at the same rev and publish it. A moved tag reaches the remote
+#    only with a forced push. REV is the full rev Studio now pins.
 git tag -f pin/cerulion-studio "$REV"
 git push --force origin refs/tags/pin/cerulion-studio
 ```
